@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
 
-
 #include <libcorpus2/tagsetmanager.h>
 #include <libcorpus2/io/xcesreader.h>
 
@@ -13,6 +12,14 @@
 #include <QFileDialog>
 
 #include <sstream>
+
+#include <vector>
+#include <QString>
+
+#include "wordsstatistics.h"
+#include "fscpmethod.h"
+#include "zscoremethod.h"
+
 
 static char swiatopoglad[] =
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -39,6 +46,91 @@ static char swiatopoglad[] =
 "<lex><base>światopogląd</base><ctag>subst:sg:acc:m3</ctag></lex>\n"
 "<lex disamb=\"1\"><base>światopogląd</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
 "</tok>\n"
+
+        "<tok>\n"
+        "<orth>nie</orth>\n"
+        "<lex disamb=\"1\"><base>nie</base><ctag>conj</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>,</orth>\n"
+        "<lex disamb=\"1\"><base>,</base><ctag>interp</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>tak</orth>\n"
+        "<lex disamb=\"1\"><base>tak</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>nie</orth>\n"
+        "<lex disamb=\"1\"><base>nie</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>może</orth>\n"
+        "<lex disamb=\"1\"><base>móc</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>nie</orth>\n"
+        "<lex disamb=\"1\"><base>nie</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>móc</orth>\n"
+        "<lex disamb=\"1\"><base>móc</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>nie</orth>\n"
+        "<lex disamb=\"1\"><base>nie</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>mógł</orth>\n"
+        "<lex disamb=\"1\"><base>móc</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>Uważam</orth>\n"
+        "<lex disamb=\"1\"><base>uważać</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>,</orth>\n"
+        "<lex disamb=\"1\"><base>,</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>że</orth>\n"
+        "<lex disamb=\"1\"><base>że</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>nie</orth>\n"
+        "<lex disamb=\"1\"><base>nie</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>zrobię</orth>\n"
+        "<lex disamb=\"1\"><base>zrobić</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>Uważam</orth>\n"
+        "<lex disamb=\"1\"><base>uważać</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>też</orth>\n"
+        "<lex disamb=\"1\"><base>też</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
+
+        "<tok>\n"
+        "<orth>,</orth>\n"
+        "<lex disamb=\"1\"><base>,</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "</tok>\n"
 "</chunk>\n"
 "</chunk>\n"
 "</chunkList>\n"
@@ -54,7 +146,7 @@ int main(int argc, char *argv[])
     w.show();
 
 #ifdef FROM_FILE
-    QString fileName = QFileDialog::getOpenFileName(0, "Otworz korpus", "/home/ijn/","*");
+    QString fileName = QFileDialog::getOpenFileName(0, "Otworz korpus", "/home/ijn/","*.ccl");
     const Corpus2::Tagset tagset = Corpus2::get_named_tagset("nkjp");
     std::ifstream istr(fileName.toUtf8());
 #else
@@ -64,11 +156,49 @@ int main(int argc, char *argv[])
 #endif
 
     Corpus2::XcesReader xr(tagset, istr);
-    Corpus2::Token *token;
 
+    /*
+    WordsStatistics *wordStats = new WordsStatistics(xr);
 
-    while(token = xr.get_next_token())
-        qDebug() << token->orth_utf8().c_str();
+    for(int i=0; i<wordStats->allWords.size(); i++)
+    {
+        qDebug() << i;
+        QString row = "";
+        for(int j=0; j<wordStats->allWords[i].size(); j++)
+            row.append(wordStats->allWords[i][j]->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(QString::number(wordStats->numberAllWords[i][j])).append(" ");
+
+        qDebug() << row;
+    }
+    */
+
+    /*
+    WordsStatistics *wordStats = new WordsStatistics(xr);
+    FSCPMethod *fscpm = new FSCPMethod(wordStats);
+    for(int i=0; i<fscpm->collocationsRank.size(); i++)
+    {
+        qDebug() << i;
+        QString row = "";
+        row.append(fscpm->collocationsRank[i].first.first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(fscpm->collocationsRank[i].first.second->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(QString::number(fscpm->collocationsRank[i].second));
+
+        qDebug() << row;
+    }
+    */
+
+    /*
+    WordsStatistics *wordStats = new WordsStatistics(xr);
+    ZScoreMethod *zsm = new ZScoreMethod(wordStats);
+    for(int i=0; i<zsm->collocationsRank.size(); i++)
+    {
+        qDebug() << i;
+        QString row = "";
+        row.append(zsm->collocationsRank[i].first.first->orth_utf8().c_str()).append(" ").append(zsm->collocationsRank[i].first.second->orth_utf8().c_str()).append(" ").append(QString::number(zsm->collocationsRank[i].second));
+
+        qDebug() << row;
+    }
+    */
+
+    //qDebug() << QString::number(wordStats->getWordsCount());
+
 
     return a.exec();
 }

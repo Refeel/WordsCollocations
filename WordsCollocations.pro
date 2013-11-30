@@ -16,8 +16,14 @@ LIBS += -lcorpus2 -lpwrutils
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    wordsstatistics.cpp \
+    fscpmethod.cpp \
+    zscoremethod.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    wordsstatistics.h \
+    fscpmethod.h \
+    zscoremethod.h
 
 FORMS    += mainwindow.ui
