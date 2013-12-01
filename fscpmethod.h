@@ -8,7 +8,7 @@ class FSCPMethod
 public:
     FSCPMethod(WordsStatistics *wordsStats);
 
-private:
+//private:
     std::vector<std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double> > collocationsRank;
 
     //metody

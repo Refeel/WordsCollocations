@@ -9,7 +9,7 @@ FSCPMethod::FSCPMethod(WordsStatistics *wordsStats)
 
 void FSCPMethod::fscpRanking(WordsStatistics *ws)
 {
-    std::vector<std::vector<Corpus2::Token*> > allWordsWithPairs = ws->getAllWordsWithPairs();
+    std::vector<std::vector<Corpus2::Token*> > & allWordsWithPairs = ws->getAllWordsWithPairs();
 
     for(size_t i=0; i<allWordsWithPairs.size(); i++)
     {

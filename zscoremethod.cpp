@@ -11,7 +11,7 @@ ZScoreMethod::ZScoreMethod(WordsStatistics *wordsStats)
 
 void ZScoreMethod::zScoreRanking(WordsStatistics *ws)
 {
-    std::vector<std::vector<Corpus2::Token*> > allWordsWithPairs = ws->getAllWordsWithPairs();
+    std::vector<std::vector<Corpus2::Token*> > & allWordsWithPairs = ws->getAllWordsWithPairs();
 
     //liczba słów w korpusie
     int n = ws->getWordsCount();

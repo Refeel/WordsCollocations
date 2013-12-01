@@ -5,6 +5,7 @@
 #include <libcorpus2/io/xcesreader.h>
 
 #include <algorithm>
+#include <boost/bind.hpp>
 
 #include <fstream>
 #include <QDebug>
@@ -168,21 +169,29 @@ int main(int argc, char *argv[])
             row.append(wordStats->allWords[i][j]->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(QString::number(wordStats->numberAllWords[i][j])).append(" ");
 
         qDebug() << row;
-    }
+    }getAllWordsWithPairs
     */
 
-    /*
+
     WordsStatistics *wordStats = new WordsStatistics(xr);
     FSCPMethod *fscpm = new FSCPMethod(wordStats);
+
+    std::sort(fscpm->collocationsRank.begin(), fscpm->collocationsRank.end(),
+              boost::bind(&std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double>::second, _1) >
+              boost::bind(&std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double>::second, _2));
+
     for(int i=0; i<fscpm->collocationsRank.size(); i++)
     {
+        if(fscpm->collocationsRank[i].second <= 1)
+            continue;
+
         qDebug() << i;
         QString row = "";
         row.append(fscpm->collocationsRank[i].first.first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(fscpm->collocationsRank[i].first.second->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(QString::number(fscpm->collocationsRank[i].second));
 
         qDebug() << row;
     }
-    */
+
 
     /*
     WordsStatistics *wordStats = new WordsStatistics(xr);
