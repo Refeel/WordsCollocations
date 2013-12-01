@@ -19,6 +19,7 @@
 #include "wordsstatistics.h"
 #include "fscpmethod.h"
 #include "zscoremethod.h"
+#include "pmimethod.h"
 
 
 static char swiatopoglad[] =
@@ -197,8 +198,20 @@ int main(int argc, char *argv[])
     }
     */
 
-    //qDebug() << QString::number(wordStats->getWordsCount());
+    /*
+    WordsStatistics *wordStats = new WordsStatistics(xr);
+    PMIMethod *pmim = new PMIMethod(wordStats);
+    for(int i=0; i<pmim->collocationsRank.size(); i++)
+    {
+        qDebug() << i;
+        QString row = "";
+        row.append(pmim->collocationsRank[i].first.first->orth_utf8().c_str()).append(" ").append(pmim->collocationsRank[i].first.second->orth_utf8().c_str()).append(" ").append(QString::number(pmim->collocationsRank[i].second));
 
+        qDebug() << row;
+    }
+    */
+
+    //qDebug() << QString::number(wordStats->getWordsCount());
 
     return a.exec();
 }

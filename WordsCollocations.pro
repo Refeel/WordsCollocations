@@ -19,11 +19,13 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     wordsstatistics.cpp \
     fscpmethod.cpp \
-    zscoremethod.cpp
+    zscoremethod.cpp \
+    pmimethod.cpp
 
 HEADERS  += mainwindow.h \
     wordsstatistics.h \
     fscpmethod.h \
-    zscoremethod.h
+    zscoremethod.h \
+    pmimethod.h
 
 FORMS    += mainwindow.ui
