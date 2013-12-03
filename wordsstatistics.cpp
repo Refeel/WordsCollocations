@@ -5,7 +5,8 @@ WordsStatistics::WordsStatistics(Corpus2::XcesReader &xr)
     xreader = &xr;
     tagset = xreader->tagset();
     wordsCount = 0;
-    signsOfPunctuation = boost::assign::list_of(",")("(")(")")("!")("?")(".")(":")(";")("-");
+    signsOfPunctuation = boost::assign::list_of(",")(".")("·")("(")(")")("!")("?")(":")(";")("-")("\\")("/")("\“");
+    ignoredWords = boost::assign::list_of("i")("o")("się")("w")("we")("z")("ze");
 
     makeStatistics( *xreader );
 }
@@ -21,33 +22,44 @@ bool WordsStatistics::isSignOfPunctuation(Corpus2::Token *token, std::vector <st
     return false;
 }
 
-bool WordsStatistics::isNewToken(Corpus2::Token *token, std::vector<std::vector<Corpus2::Token*> > allWordsTab)
+bool WordsStatistics::isIgnoredWords(Corpus2::Token *token, std::vector <std::string> ignoredWordsTab)
 {
-    for(size_t i=0; i<allWordsTab.size(); i++)
+    for(int i=0; i<SIZE_OF_IGNORED_WORDS; i++)
     {
-        if(token->get_preferred_lexeme(tagset).lemma_utf8().compare(allWordsTab[i][0]->get_preferred_lexeme(tagset).lemma_utf8()) == 0)
+        if(token->orth_utf8().c_str() == ignoredWordsTab[i])
+            return true;
+    }
+
+    return false;
+}
+
+bool WordsStatistics::isNewToken(Corpus2::Token *token)
+{
+    for(size_t i=0; i<allWords.size(); i++)
+    {
+        if(token->get_preferred_lexeme(tagset).lemma_utf8().compare(allWords[i][0]->get_preferred_lexeme(tagset).lemma_utf8()) == 0)
             return false;
     }
 
     return true;
 }
 
-bool WordsStatistics::isNewPairTokens(Corpus2::Token *token, std::vector<std::vector<Corpus2::Token*> > allWordsTab, int positionOfWord)
+bool WordsStatistics::isNewPairTokens(Corpus2::Token *token, int positionOfWord)
 {
-    for(size_t i=1; i<allWordsTab[positionOfWord].size(); i++)
+    for(size_t i=1; i<allWords[positionOfWord].size(); i++)
     {
-        if(token->get_preferred_lexeme(tagset).lemma_utf8().compare(allWordsTab[positionOfWord][i]->get_preferred_lexeme(tagset).lemma_utf8()) == 0)
+        if(token->get_preferred_lexeme(tagset).lemma_utf8().compare(allWords[positionOfWord][i]->get_preferred_lexeme(tagset).lemma_utf8()) == 0)
             return false;
     }
 
     return true;
 }
 
-int WordsStatistics::getPositionOfWord(Corpus2::Token *token, std::vector<std::vector<Corpus2::Token*> > allWordsTab)
+int WordsStatistics::getPositionOfWord(Corpus2::Token *token)
 {
-    for(size_t i=0; i<allWordsTab.size(); i++)
+    for(size_t i=0; i<allWords.size(); i++)
     {
-        if(token->get_preferred_lexeme(tagset).lemma_utf8().compare(allWordsTab[i][0]->get_preferred_lexeme(tagset).lemma_utf8()) == 0)
+        if(token->get_preferred_lexeme(tagset).lemma_utf8().compare(allWords[i][0]->get_preferred_lexeme(tagset).lemma_utf8()) == 0)
         {
             return i;
         }
@@ -56,11 +68,11 @@ int WordsStatistics::getPositionOfWord(Corpus2::Token *token, std::vector<std::v
     return -1;
 }
 
-int WordsStatistics::getPositionOfPair(Corpus2::Token *token, std::vector<std::vector<Corpus2::Token*> > allWordsTab, int positionOfWord)
+int WordsStatistics::getPositionOfPair(Corpus2::Token *token, int positionOfWord)
 {
-    for(size_t i=1; i<allWordsTab[positionOfWord].size(); i++)
+    for(size_t i=1; i<allWords[positionOfWord].size(); i++)
     {
-        if(token->get_preferred_lexeme(tagset).lemma_utf8().compare(allWordsTab[positionOfWord][i]->get_preferred_lexeme(tagset).lemma_utf8()) == 0)
+        if(token->get_preferred_lexeme(tagset).lemma_utf8().compare(allWords[positionOfWord][i]->get_preferred_lexeme(tagset).lemma_utf8()) == 0)
         {
             return i;
         }
@@ -81,13 +93,11 @@ void WordsStatistics::makeStatistics(Corpus2::XcesReader &xr)
 
         if(isSignOfPunctuation(nextToken, signsOfPunctuation) == false)
         {
-            if(isNewToken(token, allWords) == true)
+            if(isNewToken(token) == true)
             {
                 std::vector <Corpus2::Token*> tknVec(1);
                 tknVec[0] = token;
                 allWords.push_back(tknVec);
-
-                allWords.back().push_back(nextToken);
 
                 int one = 1;
                 //zliczanie wystapien danego slowa
@@ -95,21 +105,39 @@ void WordsStatistics::makeStatistics(Corpus2::XcesReader &xr)
                 numVec[0] = one;
                 numberAllWords.push_back(numVec);
 
-                //zliczanie wystapien danego slowa ze slowem nastepnym
-                numberAllWords.back().push_back(one);
+                while(isIgnoredWords(nextToken, ignoredWords) == true)
+                {
+                    nextToken = xr.get_next_token();
+                }
+
+                if(nextToken != NULL)
+                {
+                    allWords.back().push_back(nextToken);
+
+                    //zliczanie wystapien danego slowa ze slowem nastepnym
+                    numberAllWords.back().push_back(one);
+                }
             }
             else
             {
-                numberAllWords[getPositionOfWord(token, allWords)][0] += 1;
-                if(isNewPairTokens(nextToken, allWords, getPositionOfWord(token, allWords)) == true)
+                while(isIgnoredWords(nextToken, ignoredWords) == true)
                 {
-                    allWords[getPositionOfWord(token, allWords)].push_back(nextToken);
-                    int one = 1;
-                    numberAllWords[getPositionOfWord(token, allWords)].push_back(one);
+                    nextToken = xr.get_next_token();
                 }
-                else
+
+                if(nextToken != NULL)
                 {
-                    numberAllWords[getPositionOfWord(token, allWords)][getPositionOfPair(nextToken, allWords, getPositionOfWord(token, allWords))] += 1;
+                    numberAllWords[getPositionOfWord(token)][0] += 1;
+                    if(isNewPairTokens(nextToken, getPositionOfWord(token)) == true)
+                    {
+                        allWords[getPositionOfWord(token)].push_back(nextToken);
+                        int one = 1;
+                        numberAllWords[getPositionOfWord(token)].push_back(one);
+                    }
+                    else
+                    {
+                        numberAllWords[getPositionOfWord(token)][getPositionOfPair(nextToken, getPositionOfWord(token))] += 1;
+                    }
                 }
             }
 
@@ -119,7 +147,7 @@ void WordsStatistics::makeStatistics(Corpus2::XcesReader &xr)
         {
             if(isSignOfPunctuation(token, signsOfPunctuation) == false)
             {
-                if(isNewToken(token, allWords) == true)
+                if(isNewToken(token) == true)
                 {
                     std::vector <Corpus2::Token*> tknVec(1);
                     tknVec[0] = token;
@@ -133,7 +161,7 @@ void WordsStatistics::makeStatistics(Corpus2::XcesReader &xr)
                 }
                 else
                 {
-                    numberAllWords[getPositionOfWord(token, allWords)][0] += 1;
+                    numberAllWords[getPositionOfWord(token)][0] += 1;
                 }
             }
 
@@ -178,7 +206,7 @@ int WordsStatistics::getNumberOfInstancesOfPair(Corpus2::Token *token1, Corpus2:
     return 0;
 }
 
-std::vector<std::vector<Corpus2::Token*> > WordsStatistics::getAllWordsWithPairs()
+std::vector<std::vector<Corpus2::Token*> > & WordsStatistics::getAllWordsWithPairs()
 {
     return allWords;
 }

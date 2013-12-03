@@ -5,11 +5,13 @@
 #include <libcorpus2/io/xcesreader.h>
 
 #include <algorithm>
+#include <boost/bind.hpp>
 
 #include <fstream>
 #include <QDebug>
 
 #include <QFileDialog>
+#include <QFile>
 
 #include <sstream>
 
@@ -17,9 +19,7 @@
 #include <QString>
 
 #include "wordsstatistics.h"
-#include "fscpmethod.h"
-#include "zscoremethod.h"
-#include "pmimethod.h"
+#include "methods.h"
 
 
 static char swiatopoglad[] =
@@ -54,18 +54,18 @@ static char swiatopoglad[] =
         "</tok>\n"
 
         "<tok>\n"
-        "<orth>,</orth>\n"
-        "<lex disamb=\"1\"><base>,</base><ctag>interp</ctag></lex>\n"
+        "<orth>i</orth>\n"
+        "<lex disamb=\"1\"><base>i</base><ctag>interp</ctag></lex>\n"
         "</tok>\n"
 
         "<tok>\n"
-        "<orth>tak</orth>\n"
-        "<lex disamb=\"1\"><base>tak</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "<orth>i</orth>\n"
+        "<lex disamb=\"1\"><base>i</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
         "</tok>\n"
 
         "<tok>\n"
-        "<orth>nie</orth>\n"
-        "<lex disamb=\"1\"><base>nie</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "<orth>i</orth>\n"
+        "<lex disamb=\"1\"><base>i</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
         "</tok>\n"
 
         "<tok>\n"
@@ -74,8 +74,8 @@ static char swiatopoglad[] =
         "</tok>\n"
 
         "<tok>\n"
-        "<orth>nie</orth>\n"
-        "<lex disamb=\"1\"><base>nie</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
+        "<orth>i</orth>\n"
+        "<lex disamb=\"1\"><base>i</base><ctag>subst:sg:nom:m3</ctag></lex>\n"
         "</tok>\n"
 
         "<tok>\n"
@@ -159,6 +159,7 @@ int main(int argc, char *argv[])
     Corpus2::XcesReader xr(tagset, istr);
 
     /*
+    //wyswietlanie statystyki slow
     WordsStatistics *wordStats = new WordsStatistics(xr);
 
     for(int i=0; i<wordStats->allWords.size(); i++)
@@ -173,45 +174,43 @@ int main(int argc, char *argv[])
     */
 
     /*
+    //wyswietlanie wszyskich rankingow obok kolokacji (uwaga: rankingi nie moga byc posortowane)
     WordsStatistics *wordStats = new WordsStatistics(xr);
-    FSCPMethod *fscpm = new FSCPMethod(wordStats);
-    for(int i=0; i<fscpm->collocationsRank.size(); i++)
+    Methods *m = new Methods(wordStats);
+    for(int i=0; i<m->collocationsRankFSCP.size(); i++)
     {
         qDebug() << i;
         QString row = "";
-        row.append(fscpm->collocationsRank[i].first.first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(fscpm->collocationsRank[i].first.second->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(QString::number(fscpm->collocationsRank[i].second));
-
+        row.append(m->collocationsRankFSCP[i].first.first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(m->collocationsRankFSCP[i].first.second->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" FSCP: ").append(QString::number(m->collocationsRankFSCP[i].second)).append(" Z-Score: ").append(QString::number(m->collocationsRankZScore[i].second)).append(" PMI: ").append(QString::number(m->collocationsRankPMI[i].second));
         qDebug() << row;
     }
     */
 
-    /*
+
+    //wysietlanie posortowanych rankingow
     WordsStatistics *wordStats = new WordsStatistics(xr);
-    ZScoreMethod *zsm = new ZScoreMethod(wordStats);
-    for(int i=0; i<zsm->collocationsRank.size(); i++)
+    Methods *m = new Methods(wordStats);
+
+    QString fileNameOut = "kolokacje.out";
+    QFile mFile(fileNameOut);
+
+    if(!mFile.open(QFile::WriteOnly | QFile::Text)){
+        qDebug() << "Could not open file for writing";
+    }
+    QTextStream out(&mFile);
+
+    for(int i=0; i<m->collocationsRankFSCP.size(); i++)
     {
         qDebug() << i;
         QString row = "";
-        row.append(zsm->collocationsRank[i].first.first->orth_utf8().c_str()).append(" ").append(zsm->collocationsRank[i].first.second->orth_utf8().c_str()).append(" ").append(QString::number(zsm->collocationsRank[i].second));
-
+        row.append(m->collocationsRankFSCP[i].first.first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(m->collocationsRankFSCP[i].first.second->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" FSCP: ").append(QString::number(m->collocationsRankFSCP[i].second));
+        row.append(" | ").append(m->collocationsRankZScore[i].first.first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(m->collocationsRankZScore[i].first.second->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" Z-Score: ").append(QString::number(m->collocationsRankZScore[i].second));
+        row.append(" | ").append(m->collocationsRankPMI[i].first.first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(m->collocationsRankPMI[i].first.second->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" PMI: ").append(QString::number(m->collocationsRankPMI[i].second));
         qDebug() << row;
+        out << row;
+        out << "\n";
     }
-    */
 
-    /*
-    WordsStatistics *wordStats = new WordsStatistics(xr);
-    PMIMethod *pmim = new PMIMethod(wordStats);
-    for(int i=0; i<pmim->collocationsRank.size(); i++)
-    {
-        qDebug() << i;
-        QString row = "";
-        row.append(pmim->collocationsRank[i].first.first->orth_utf8().c_str()).append(" ").append(pmim->collocationsRank[i].first.second->orth_utf8().c_str()).append(" ").append(QString::number(pmim->collocationsRank[i].second));
-
-        qDebug() << row;
-    }
-    */
-
-    //qDebug() << QString::number(wordStats->getWordsCount());
 
     return a.exec();
 }
