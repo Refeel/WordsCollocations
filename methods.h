@@ -12,12 +12,11 @@ class Methods
 public:
     Methods(WordsStatistics *wordsStats);
 
-
     std::vector<std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double> > collocationsRankFSCP;
     std::vector<std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double> > collocationsRankZScore;
     std::vector<std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double> > collocationsRankPMI;
 
-
+private:
     void ranking(WordsStatistics *ws);
 
     //wartosc oczekiwania liczby wystapien pary (w1, w2) w korpusie

@@ -18,10 +18,12 @@ LIBS += -lcorpus2 -lpwrutils
 SOURCES += main.cpp\
         mainwindow.cpp \
     wordsstatistics.cpp \
-    methods.cpp
+    methods.cpp \
+    wordsstatisticngrams.cpp
 
 HEADERS  += mainwindow.h \
     wordsstatistics.h \
-    methods.h
+    methods.h \
+    wordsstatisticngrams.h
 
 FORMS    += mainwindow.ui

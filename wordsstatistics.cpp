@@ -110,13 +110,10 @@ void WordsStatistics::makeStatistics(Corpus2::XcesReader &xr)
                     nextToken = xr.get_next_token();
                 }
 
-                if(nextToken != NULL)
-                {
-                    allWords.back().push_back(nextToken);
+                allWords.back().push_back(nextToken);
 
-                    //zliczanie wystapien danego slowa ze slowem nastepnym
-                    numberAllWords.back().push_back(one);
-                }
+                //zliczanie wystapien danego slowa ze slowem nastepnym
+                numberAllWords.back().push_back(one);
             }
             else
             {
@@ -125,19 +122,16 @@ void WordsStatistics::makeStatistics(Corpus2::XcesReader &xr)
                     nextToken = xr.get_next_token();
                 }
 
-                if(nextToken != NULL)
+                numberAllWords[getPositionOfWord(token)][0] += 1;
+                if(isNewPairTokens(nextToken, getPositionOfWord(token)) == true)
                 {
-                    numberAllWords[getPositionOfWord(token)][0] += 1;
-                    if(isNewPairTokens(nextToken, getPositionOfWord(token)) == true)
-                    {
-                        allWords[getPositionOfWord(token)].push_back(nextToken);
-                        int one = 1;
-                        numberAllWords[getPositionOfWord(token)].push_back(one);
-                    }
-                    else
-                    {
-                        numberAllWords[getPositionOfWord(token)][getPositionOfPair(nextToken, getPositionOfWord(token))] += 1;
-                    }
+                    allWords[getPositionOfWord(token)].push_back(nextToken);
+                    int one = 1;
+                    numberAllWords[getPositionOfWord(token)].push_back(one);
+                }
+                else
+                {
+                    numberAllWords[getPositionOfWord(token)][getPositionOfPair(nextToken, getPositionOfWord(token))] += 1;
                 }
             }
 
