@@ -20,6 +20,7 @@
 
 #include "wordsstatistics.h"
 #include "methods.h"
+#include "methodsngrams.h"
 
 #include "wordsstatisticngrams.h"
 
@@ -139,7 +140,7 @@ static char swiatopoglad[] =
 "</cesAna>\n"
 ;
 
-//#define FROM_FILE
+#define FROM_FILE
 
 int main(int argc, char *argv[])
 {
@@ -187,7 +188,7 @@ int main(int argc, char *argv[])
     }
     */
 
-
+    /*
     //wysietlanie posortowanych rankingow
     WordsStatistics *wordStats = new WordsStatistics(xr);
     Methods *m = new Methods(wordStats);
@@ -211,54 +212,26 @@ int main(int argc, char *argv[])
         out << row;
         out << "\n";
     }
-
-
-    /*
-    //wyswietlanie statystyki n-gramow z ich czestotliwoscia wystapien (uwaga: trzeba zakomentowac private w klasie)
-    WordsStatisticNGrams *wsng = new WordsStatisticNGrams(xr);
-    for(int i=0; i<wsng->nGramsWithCount.size(); i++)
-    {
-        qDebug() << i;
-        QString row = "";
-        row.append(wsng->allWordsWithCount[i].first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(QString::number(wsng->allWordsWithCount[i].second)).append(" -> ");
-        for(int j=0; j<wsng->nGramsWithCount[i].size(); j++)
-        {
-            for(int k=0; k<wsng->nGramsWithCount[i][j].first.size(); k++)
-            {
-                row.append(wsng->nGramsWithCount[i][j].first[k].first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(QString::number(wsng->nGramsWithCount[i][j].first[k].second)).append(" ");
-            }
-            row.append(QString::number(wsng->nGramsWithCount[i][j].second)).append(" | ");
-        }
-        qDebug() << row;
-    }
-
-    delete wsng;
     */
 
-    /*
-    //wyswietlanie statystyki n-gramow
-    WordsStatisticNGrams *wsng = new WordsStatisticNGrams(xr);
-    std::vector<std::pair<Corpus2::Token*, std::vector<std::vector<std::pair<Corpus2::Token*, int> > > > > *vector = wsng->getAllNGramsForAllPivots();
-    for(int i=0; i<vector->size(); i++)
+    WordsStatisticNGrams *wordStats = new WordsStatisticNGrams(xr);
+    MethodsNGrams *methods = new MethodsNGrams(wordStats);
+
+    for(int i=0;i<methods->collocationsRankSCP.size(); i++)
     {
-        qDebug() << i;
-        QString row = "";
-        row.append((*vector)[i].first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" -> ");
-        for(int j=0; j<(*vector)[i].second.size(); j++)
-        {
-            for(int k=0; k<(*vector)[i].second[j].size(); k++)
-            {
-                row.append((*vector)[i].second[j][k].first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(QString::number((*vector)[i].second[j][k].second)).append(" ");
-            }
-            row.append(" | ");
-        }
-        qDebug() << row;
+        qDebug() << methods->collocationsRankSCP[i].first << " " << methods->collocationsRankSCP[i].second;
     }
 
+//    for(int i=0; i< wordStats->wordsStatistic.size(); i++)
+//    {
+//        QHash<QString, int>::const_iterator iter = wordStats->wordsStatistic[i].constBegin();
+//        while( iter != wordStats->wordsStatistic[i].constEnd())
+//        {
+//            qDebug() << iter.key() << " " << iter.value();
+//            iter++;
+//        }
+//    }
 
-    delete wsng;
-    delete vector;
-    */
 
     return a.exec();
 }
