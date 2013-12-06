@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <QString>
+#include <QHeaderView>
 
 #include "wordsstatistics.h"
 #include "methods.h"
@@ -44,6 +45,11 @@ void MainWindow::onNgramsChecked()
 {
     ui->bigramsGroupBox->setEnabled(false);
     ui->ngramsGroupBox->setEnabled(true);
+}
+
+void MainWindow::onSectionClicked(int logicalIndex)
+{
+    ui->collTableWidget->sortByColumn(logicalIndex);
 }
 
 void MainWindow::findCollocations()
@@ -141,4 +147,7 @@ void MainWindow::findCollocations()
             if(scpStatus)  ui->collTableWidget->setItem(i,scpColId, new QTableWidgetItem(QString::number(m->collocationsRankSCP[i].second)));
         }
     }
+
+    QHeaderView *header = ui->collTableWidget->horizontalHeader();
+    connect(header, SIGNAL(sectionClicked(int) ), this, SLOT(onSectionClicked(int)) );
 }

@@ -19,6 +19,7 @@ private slots:
     void findCollocations();
     void onBigramsChecked();
     void onNgramsChecked();
+    void onSectionClicked(int logicalIndex);
 
 private:
     Ui::MainWindow *ui;

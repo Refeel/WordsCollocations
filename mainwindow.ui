@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Words Collocations</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QGroupBox" name="bigramsGroupBox">
@@ -38,6 +38,9 @@
      <property name="text">
       <string>FSCP</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QCheckBox" name="zscoreCheckBox">
      <property name="geometry">
@@ -51,6 +54,9 @@
      <property name="text">
       <string>z-score</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QCheckBox" name="PMICheckBox">
      <property name="geometry">
@@ -63,6 +69,9 @@
      </property>
      <property name="text">
       <string>PMI</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QCheckBox" name="numFilterCheckBox">
@@ -177,6 +186,9 @@
      <property name="text">
       <string>MI</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QCheckBox" name="SCPCheckBox">
      <property name="geometry">
@@ -189,6 +201,9 @@
      </property>
      <property name="text">
       <string>SCP</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>
