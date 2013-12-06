@@ -148,17 +148,17 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-#ifdef FROM_FILE
-    QString fileName = QFileDialog::getOpenFileName(0, "Otworz korpus", "/home/ijn/","*.ccl");
-    const Corpus2::Tagset tagset = Corpus2::get_named_tagset("nkjp");
-    std::ifstream istr(fileName.toUtf8());
-#else
-    const Corpus2::Tagset tagset = Corpus2::get_named_tagset("kipi");
-    std::stringstream istr;
-    istr << swiatopoglad;
-#endif
+//#ifdef FROM_FILE
+//    QString fileName = QFileDialog::getOpenFileName(0, "Otworz korpus", "/home/ijn/","*.ccl");
+//    const Corpus2::Tagset tagset = Corpus2::get_named_tagset("nkjp");
+//    std::ifstream istr(fileName.toUtf8());
+//#else
+//    const Corpus2::Tagset tagset = Corpus2::get_named_tagset("kipi");
+//    std::stringstream istr;
+//    istr << swiatopoglad;
+//#endif
 
-    Corpus2::XcesReader xr(tagset, istr);
+//    Corpus2::XcesReader xr(tagset, istr);
 
     /*
     //wyswietlanie statystyki slow
@@ -214,13 +214,13 @@ int main(int argc, char *argv[])
     }
     */
 
-    WordsStatisticNGrams *wordStats = new WordsStatisticNGrams(xr);
-    MethodsNGrams *methods = new MethodsNGrams(wordStats);
+//    WordsStatisticNGrams *wordStats = new WordsStatisticNGrams(xr);
+//    MethodsNGrams *methods = new MethodsNGrams(wordStats);
 
-    for(int i=0;i<methods->collocationsRankSCP.size(); i++)
-    {
-        qDebug() << methods->collocationsRankSCP[i].first << " " << methods->collocationsRankSCP[i].second;
-    }
+//    for(int i=0;i<methods->collocationsRankSCP.size(); i++)
+//    {
+//        qDebug() << methods->collocationsRankSCP[i].first << " " << methods->collocationsRankSCP[i].second;
+//    }
 
 //    for(int i=0; i< wordStats->wordsStatistic.size(); i++)
 //    {

@@ -28,13 +28,13 @@ void MethodsNGrams::ranking(WordsStatisticNGrams *ws)
     }
 
 
-    std::sort(collocationsRankSI.begin(), collocationsRankSI.end(),
-            boost::bind(&std::pair<QString, double>::second, _1) >
-            boost::bind(&std::pair<QString, double>::second, _2));
+//    std::sort(collocationsRankSI.begin(), collocationsRankSI.end(),
+//            boost::bind(&std::pair<QString, double>::second, _1) >
+//            boost::bind(&std::pair<QString, double>::second, _2));
 
-    std::sort(collocationsRankSCP.begin(), collocationsRankSCP.end(),
-            boost::bind(&std::pair<QString, double>::second, _1) >
-            boost::bind(&std::pair<QString, double>::second, _2));
+//    std::sort(collocationsRankSCP.begin(), collocationsRankSCP.end(),
+//            boost::bind(&std::pair<QString, double>::second, _1) >
+//            boost::bind(&std::pair<QString, double>::second, _2));
 
 }
 

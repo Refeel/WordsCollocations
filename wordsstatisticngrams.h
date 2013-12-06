@@ -11,7 +11,7 @@
 class WordsStatisticNGrams
 {
 public:
-    WordsStatisticNGrams(Corpus2::XcesReader &xr);
+    WordsStatisticNGrams(Corpus2::XcesReader &xr, unsigned n);
 
     void setN(unsigned n);
     int getN();

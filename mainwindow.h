@@ -15,6 +15,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+    void findCollocations();
+    void onBigramsChecked();
+    void onNgramsChecked();
+
 private:
     Ui::MainWindow *ui;
 };

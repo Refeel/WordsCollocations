@@ -49,7 +49,7 @@ void Methods::ranking(WordsStatistics *ws)
         }
     }
 
-    sortingRanking();
+//    sortingRanking();
 }
 
 

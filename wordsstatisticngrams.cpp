@@ -1,11 +1,11 @@
 #include "wordsstatisticngrams.h"
 
-WordsStatisticNGrams::WordsStatisticNGrams(Corpus2::XcesReader &xr)
+WordsStatisticNGrams::WordsStatisticNGrams(Corpus2::XcesReader &xr, unsigned n)
 {
     xreader = &xr;
     tagset = xreader->tagset();
 
-    setN(3);
+    setN(n);
     wordsCount = 0;
 
     makeStatistics( *xreader );
