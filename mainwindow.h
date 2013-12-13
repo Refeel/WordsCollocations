@@ -3,6 +3,10 @@
 
 #include <QMainWindow>
 
+class WordsStatisticNGrams;
+class Methods;
+class MethodsNGrams;
+
 namespace Ui {
 class MainWindow;
 }
@@ -20,9 +24,15 @@ private slots:
     void onBigramsChecked();
     void onNgramsChecked();
     void onSectionClicked(int logicalIndex);
+    void onUseSignsOfSegmChecked();
+    void onUseIgnoredWordsChecked();
 
 private:
     Ui::MainWindow *ui;
+
+    WordsStatisticNGrams *wordStats;
+    Methods *methodsBi;
+    MethodsNGrams *methodsN;
 };
 
 #endif // MAINWINDOW_H

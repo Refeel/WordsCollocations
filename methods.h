@@ -1,23 +1,21 @@
 #ifndef METHODS_H
 #define METHODS_H
 
-#include "wordsstatistics.h"
-
-#include <math.h>
-
-#include <boost/bind.hpp>
+#include "wordsstatisticngrams.h"
+#include "math.h"
 
 class Methods
 {
 public:
-    Methods(WordsStatistics *wordsStats);
+    Methods(WordsStatisticNGrams *wordsStats);
+    ~Methods();
 
-    std::vector<std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double> > collocationsRankFSCP;
-    std::vector<std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double> > collocationsRankZScore;
-    std::vector<std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double> > collocationsRankPMI;
+    std::vector<std::pair<QString, double> > collocationsRankFSCP;
+    std::vector<std::pair<QString, double> > collocationsRankZScore;
+    std::vector<std::pair<QString, double> > collocationsRankPMI;
 
 private:
-    void ranking(WordsStatistics *ws);
+    void ranking(WordsStatisticNGrams *ws);
 
     //wartosc oczekiwania liczby wystapien pary (w1, w2) w korpusie
     double getE(double numberOfInstancesOfWord1, double numberOfInstancesOfWord2, double numberOfAllInstances);
@@ -32,8 +30,6 @@ private:
     double getFSCPRank(double numberOfInstancesOfWordPair, double numberOfInstancesOfWord1, double numberOfInstancesOfWord2);
     double getZScoreRank(double numberOfInstancesOfWordPair, double numberOfInstancesOfWord1, double numberOfInstancesOfWord2, double numberOfAllInstances);
     double getPMIRank(double numberOfInstancesOfWordPair, double numberOfInstancesOfWord1, double numberOfInstancesOfWord2, double numberOfAllInstances);
-
-    void sortingRanking();
 };
 
 #endif // METHODS_H

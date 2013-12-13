@@ -7,15 +7,12 @@
 #include <QFileDialog>
 #include <QFile>
 
-#include <QtSql/QSqlTableModel>
-#include <QtSql/QSqlDatabase>
 #include <sstream>
 
 #include <vector>
 #include <QString>
 #include <QHeaderView>
 
-#include "wordsstatistics.h"
 #include "methods.h"
 #include "methodsngrams.h"
 
@@ -28,10 +25,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    wordStats = NULL;
+    methodsBi = NULL;
+    methodsN  = NULL;
 }
 
 MainWindow::~MainWindow()
 {
+    delete wordStats;
+    delete methodsBi;
+    delete methodsN;
+
     delete ui;
 }
 
@@ -52,35 +57,82 @@ void MainWindow::onSectionClicked(int logicalIndex)
     ui->collTableWidget->sortByColumn(logicalIndex);
 }
 
+void MainWindow::onUseSignsOfSegmChecked()
+{
+    ui->signsOfSegmLineEdit->setEnabled(ui->signsOfSegmCheckBox->isChecked());
+}
+
+void MainWindow::onUseIgnoredWordsChecked()
+{
+    ui->ignoredWordsLineEdit->setEnabled(ui->ignoredWordsCheckBox->isChecked());
+}
+
 void MainWindow::findCollocations()
 {
     QString fileName = QFileDialog::getOpenFileName(0, "Otworz korpus", "/home/ijn/","*.ccl");
+    if(fileName.size() == 0)
+        return;
+
     const Corpus2::Tagset tagset = Corpus2::get_named_tagset("nkjp");
     std::ifstream istr(fileName.toUtf8());
 
-    Corpus2::XcesReader xr(tagset, istr);
+    Corpus2::XcesReader *xr = new Corpus2::XcesReader(tagset, istr);
 
+    delete wordStats; wordStats = NULL;
+    delete methodsBi; methodsBi = NULL;
+    delete methodsN;  methodsN  = NULL;
+
+    ui->collTableWidget->clear();
+
+    bool numbersFilterStatus = ui->numFilterCheckBox->isChecked();
+    bool properNamesFilterStatus = ui->propNamesCheckBox->isChecked();
+    bool useSignsOfSegm = ui->signsOfSegmCheckBox->isChecked();
+    bool useIgnoredWords = ui->ignoredWordsCheckBox->isChecked();
+
+    QStringList signsOfSegm; signsOfSegm.clear();
+    QStringList ignoredWords; ignoredWords.clear();
+
+    if(useSignsOfSegm)
+    {
+        QString str = ui->signsOfSegmLineEdit->text();
+        signsOfSegm = str.split(" ");
+    }
+
+    if(useIgnoredWords)
+    {
+        QString str = ui->ignoredWordsLineEdit->text();
+        ignoredWords = str.split(" ");
+    }
 
     if(ui->bigramsRadioButton->isChecked())
     {
         bool fscpStatus = ui->FSCPCheckBox->isChecked();
         bool zscoreStatus = ui->zscoreCheckBox->isChecked();
         bool pmiStatus = ui->PMICheckBox->isChecked();
-        bool numbersFilterStatus = ui->numFilterCheckBox->isChecked();
-        bool properNamesFilterStatus = ui->propNamesCheckBox->isChecked();
 
-        WordsStatistics *wordStats = new WordsStatistics(xr);
-        Methods *m = new Methods(wordStats);
+        wordStats = new WordsStatisticNGrams(*xr, 2);
+
+        for(int i=0; i<signsOfSegm.size(); i++)
+            wordStats->addSegmentationSign(signsOfSegm[i]);
+
+        for(int i=0; i<ignoredWords.size(); i++)
+            wordStats->addIgnoredWord(ignoredWords[i].toStdString());
+
+        wordStats->setFilterProperNamesEnabled(properNamesFilterStatus);
+        wordStats->setFilterNumbersEnabled(numbersFilterStatus);
+
+        wordStats->makeStatistics();
+
+        methodsBi = new Methods(wordStats);
 
 
-
-        ui->collTableWidget->setRowCount(m->collocationsRankFSCP.size());
+        ui->collTableWidget->setRowCount(methodsBi->collocationsRankFSCP.size());
         ui->collTableWidget->setColumnCount(1 + (int)fscpStatus + (int)zscoreStatus + (int)pmiStatus);
 
         ui->collTableWidget->setHorizontalHeaderItem(0, new QTableWidgetItem("Collocations"));
 
         int colsNum = 1;
-        int fscpColId, zscoreColId, pmiColId;
+        int fscpColId=0, zscoreColId=0, pmiColId=0;
 
         if(fscpStatus)
             ui->collTableWidget->setHorizontalHeaderItem(fscpColId = colsNum++, new QTableWidgetItem("FSCP"));
@@ -93,21 +145,33 @@ void MainWindow::findCollocations()
 
 
 
+        QTableWidgetItem *item;
 
-        for(int i=0; i<m->collocationsRankFSCP.size(); i++)
+        for(unsigned i=0; i<methodsBi->collocationsRankFSCP.size(); i++)
         {
-            qDebug() << i;
-            QString row = "";
-            row.append(m->collocationsRankFSCP[i].first.first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(m->collocationsRankFSCP[i].first.second->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" FSCP: ").append(QString::number(m->collocationsRankFSCP[i].second)).append(" Z-Score: ").append(QString::number(m->collocationsRankZScore[i].second)).append(" PMI: ").append(QString::number(m->collocationsRankPMI[i].second));
-            qDebug() << row;
+            ui->collTableWidget->setItem(i,0, new QTableWidgetItem(QString(methodsBi->collocationsRankFSCP[i].first)));
 
-            ui->collTableWidget->setItem(i,0, new QTableWidgetItem(QString(m->collocationsRankFSCP[i].first.first->get_preferred_lexeme(tagset).lemma_utf8().c_str()).append(" ").append(m->collocationsRankFSCP[i].first.second->get_preferred_lexeme(tagset).lemma_utf8().c_str())));
-            if(fscpStatus)   ui->collTableWidget->setItem(i,fscpColId, new QTableWidgetItem(QString::number(m->collocationsRankFSCP[i].second)));
-            if(zscoreStatus) ui->collTableWidget->setItem(i,zscoreColId, new QTableWidgetItem(QString::number(m->collocationsRankZScore[i].second)));
-            if(pmiStatus)    ui->collTableWidget->setItem(i,pmiColId, new QTableWidgetItem(QString::number(m->collocationsRankPMI[i].second)));
+            if(fscpStatus)
+            {
+                item = new QTableWidgetItem();
+                item->setData(Qt::DisplayRole, methodsBi->collocationsRankFSCP[i].second);
+                ui->collTableWidget->setItem(i,fscpColId, item);
+            }
+
+            if(zscoreStatus)
+            {
+                item = new QTableWidgetItem();
+                item->setData(Qt::DisplayRole, methodsBi->collocationsRankZScore[i].second);
+                ui->collTableWidget->setItem(i,zscoreColId, item);
+            }
+
+            if(pmiStatus)
+            {
+                item = new QTableWidgetItem();
+                item->setData(Qt::DisplayRole, methodsBi->collocationsRankPMI[i].second);
+                ui->collTableWidget->setItem(i,pmiColId, item);
+            }
         }
-
-
     }
     else if(ui->ngramsRadioButton->isChecked())
     {
@@ -115,20 +179,29 @@ void MainWindow::findCollocations()
         bool miStatus = ui->MICheckBox->isChecked();
         bool scpStatus = ui->SCPCheckBox->isChecked();
 
+        wordStats = new WordsStatisticNGrams(*xr, n);
 
-        WordsStatisticNGrams *wordStats = new WordsStatisticNGrams(xr, ui->nSpinBox->value());
+        for(int i=0; i<signsOfSegm.size(); i++)
+            wordStats->addSegmentationSign(signsOfSegm[i]);
 
-        MethodsNGrams *m = new MethodsNGrams(wordStats);
+        for(int i=0; i<ignoredWords.size(); i++)
+            wordStats->addIgnoredWord(ignoredWords[i].toStdString());
 
+        wordStats->setFilterProperNamesEnabled(properNamesFilterStatus);
+        wordStats->setFilterNumbersEnabled(numbersFilterStatus);
 
-        ui->collTableWidget->setRowCount(m->collocationsRankSCP.size());
+        wordStats->makeStatistics();
+
+        methodsN = new MethodsNGrams(wordStats);
+
+        ui->collTableWidget->setRowCount(methodsN->collocationsRankSCP.size());
         ui->collTableWidget->setColumnCount(1 + (int)miStatus + (int)scpStatus);
 
         ui->collTableWidget->setHorizontalHeaderItem(0, new QTableWidgetItem("Collocations"));
 
         int colsNum = 1;
 
-        int miColId, scpColId;
+        int miColId=0, scpColId=0;
 
         if(miStatus)
             ui->collTableWidget->setHorizontalHeaderItem(miColId = colsNum++, new QTableWidgetItem("MI"));
@@ -137,17 +210,30 @@ void MainWindow::findCollocations()
             ui->collTableWidget->setHorizontalHeaderItem(scpColId = colsNum++, new QTableWidgetItem("SCP"));
 
 
-        for(int i=0;i<m->collocationsRankSCP.size(); i++)
+        QTableWidgetItem *item;
+
+        for(size_t i=0;i<methodsN->collocationsRankSCP.size(); i++)
         {
-            qDebug() << m->collocationsRankSCP[i].first << " " << m->collocationsRankSCP[i].second;
+            ui->collTableWidget->setItem(i, 0, new QTableWidgetItem(methodsN->collocationsRankSCP[i].first));
 
-            ui->collTableWidget->setItem(i, 0, new QTableWidgetItem(m->collocationsRankSCP[i].first));
+            if(miStatus)
+            {
+                item = new QTableWidgetItem();
+                item->setData(Qt::DisplayRole, methodsN->collocationsRankSI[i].second);
+                ui->collTableWidget->setItem(i,miColId, item);
+            }
 
-            if(miStatus)   ui->collTableWidget->setItem(i,miColId, new QTableWidgetItem(QString::number(m->collocationsRankSI[i].second)));
-            if(scpStatus)  ui->collTableWidget->setItem(i,scpColId, new QTableWidgetItem(QString::number(m->collocationsRankSCP[i].second)));
+            if(scpStatus)
+            {
+                item = new QTableWidgetItem();
+                item->setData(Qt::DisplayRole, methodsN->collocationsRankSCP[i].second);
+                ui->collTableWidget->setItem(i,scpColId, item);
+            }
         }
     }
 
     QHeaderView *header = ui->collTableWidget->horizontalHeader();
     connect(header, SIGNAL(sectionClicked(int) ), this, SLOT(onSectionClicked(int)) );
+
+    delete xr;
 }

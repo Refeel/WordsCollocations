@@ -2,29 +2,52 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1064</width>
-    <height>590</height>
+    <width>999</width>
+    <height>701</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Words Collocations</string>
+  </property>
+  <property name="documentMode">
+   <bool>false</bool>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QGroupBox" name="bigramsGroupBox">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>40</y>
+      <x>770</x>
+      <y>10</y>
       <width>221</width>
-      <height>211</height>
+      <height>121</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <italic>true</italic>
+     </font>
+    </property>
     <property name="title">
-     <string>Bi-grams options</string>
+     <string/>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
     </property>
     <widget class="QCheckBox" name="FSCPCheckBox">
      <property name="geometry">
@@ -34,6 +57,11 @@
        <width>85</width>
        <height>21</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
      </property>
      <property name="text">
       <string>FSCP</string>
@@ -51,6 +79,11 @@
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
      <property name="text">
       <string>z-score</string>
      </property>
@@ -67,6 +100,11 @@
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
      <property name="text">
       <string>PMI</string>
      </property>
@@ -74,41 +112,74 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QCheckBox" name="numFilterCheckBox">
+    <widget class="Line" name="line_2">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>140</y>
-       <width>111</width>
-       <height>21</height>
+       <x>0</x>
+       <y>1</y>
+       <width>221</width>
+       <height>41</height>
       </rect>
      </property>
-     <property name="text">
-      <string>numbers filter</string>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QCheckBox" name="propNamesCheckBox">
+    <widget class="Line" name="line_3">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>170</y>
-       <width>141</width>
+       <x>-15</x>
+       <y>20</y>
+       <width>31</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_4">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>20</y>
+       <width>21</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>110</y>
+       <width>221</width>
        <height>21</height>
       </rect>
      </property>
-     <property name="text">
-      <string>proper names filter</string>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </widget>
    <widget class="QRadioButton" name="bigramsRadioButton">
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>770</x>
       <y>10</y>
       <width>100</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <italic>false</italic>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="text">
      <string>bi-grams</string>
@@ -120,11 +191,17 @@
    <widget class="QRadioButton" name="ngramsRadioButton">
     <property name="geometry">
      <rect>
-      <x>780</x>
-      <y>270</y>
+      <x>770</x>
+      <y>140</y>
       <width>100</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="text">
      <string>n-grams</string>
@@ -136,36 +213,51 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>300</y>
+      <x>770</x>
+      <y>140</y>
       <width>221</width>
-      <height>151</height>
+      <height>141</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <italic>true</italic>
+     </font>
+    </property>
     <property name="title">
-     <string>N-grams options</string>
+     <string/>
     </property>
     <widget class="QLabel" name="nLabel">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>15</x>
        <y>30</y>
        <width>57</width>
-       <height>21</height>
+       <height>31</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
      <property name="text">
-      <string>n = </string>
+      <string>n  = </string>
      </property>
     </widget>
     <widget class="QSpinBox" name="nSpinBox">
      <property name="geometry">
       <rect>
-       <x>40</x>
+       <x>45</x>
        <y>30</y>
        <width>47</width>
-       <height>24</height>
+       <height>31</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
      </property>
      <property name="minimum">
       <number>2</number>
@@ -183,6 +275,11 @@
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
      <property name="text">
       <string>MI</string>
      </property>
@@ -199,6 +296,11 @@
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
      <property name="text">
       <string>SCP</string>
      </property>
@@ -206,15 +308,86 @@
       <bool>true</bool>
      </property>
     </widget>
+    <widget class="Line" name="line_6">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>10</y>
+       <width>221</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_8">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>60</y>
+       <width>221</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_9">
+     <property name="geometry">
+      <rect>
+       <x>-10</x>
+       <y>20</y>
+       <width>21</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_10">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>20</y>
+       <width>21</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_7">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>130</y>
+       <width>221</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </widget>
    <widget class="QPushButton" name="createCollPushButton">
     <property name="geometry">
      <rect>
-      <x>800</x>
-      <y>480</y>
-      <width>231</width>
+      <x>770</x>
+      <y>600</y>
+      <width>221</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="text">
      <string>START</string>
@@ -226,17 +399,309 @@
       <x>10</x>
       <y>10</y>
       <width>751</width>
-      <height>501</height>
+      <height>621</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
    </widget>
+   <widget class="QGroupBox" name="filtersGroupBox">
+    <property name="geometry">
+     <rect>
+      <x>770</x>
+      <y>320</y>
+      <width>221</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <italic>true</italic>
+     </font>
+    </property>
+    <property name="title">
+     <string>Filters:</string>
+    </property>
+    <widget class="QCheckBox" name="numFilterCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>45</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
+     <property name="text">
+      <string>numbers filter</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_11">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>80</y>
+       <width>221</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_13">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>10</y>
+       <width>221</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_14">
+     <property name="geometry">
+      <rect>
+       <x>-10</x>
+       <y>20</y>
+       <width>21</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_15">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>20</y>
+       <width>21</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>770</x>
+      <y>420</y>
+      <width>221</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <italic>true</italic>
+     </font>
+    </property>
+    <property name="title">
+     <string>Additional options:</string>
+    </property>
+    <widget class="QCheckBox" name="signsOfSegmCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>161</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
+     <property name="text">
+      <string>signs of segmentation</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="signsOfSegmLineEdit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>201</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
+     <property name="text">
+      <string>. , ; : ( ) [ ] { } &lt; &gt; ! ? - – — „ ” &quot; « »</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="ignoredWordsCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>171</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
+     <property name="text">
+      <string>ignored words</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="ignoredWordsLineEdit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>201</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
+     <property name="text">
+      <string>i I o O się Się w W we We z Z ze Ze</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_5">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>5</y>
+       <width>221</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_16">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>150</y>
+       <width>221</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_17">
+     <property name="geometry">
+      <rect>
+       <x>-10</x>
+       <y>20</y>
+       <width>21</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_18">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>20</y>
+       <width>21</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="Line" name="line_12">
+    <property name="geometry">
+     <rect>
+      <x>770</x>
+      <y>290</y>
+      <width>221</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <property name="lineWidth">
+     <number>3</number>
+    </property>
+    <property name="midLineWidth">
+     <number>0</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="propNamesCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>350</y>
+      <width>171</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <italic>false</italic>
+     </font>
+    </property>
+    <property name="text">
+     <string>proper names filter</string>
+    </property>
+   </widget>
+   <zorder>ngramsGroupBox</zorder>
+   <zorder>bigramsGroupBox</zorder>
+   <zorder>bigramsRadioButton</zorder>
+   <zorder>ngramsRadioButton</zorder>
+   <zorder>createCollPushButton</zorder>
+   <zorder>filtersGroupBox</zorder>
+   <zorder>groupBox_2</zorder>
+   <zorder>line_12</zorder>
+   <zorder>propNamesCheckBox</zorder>
+   <zorder>collTableWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1064</width>
+     <width>999</width>
      <height>20</height>
     </rect>
    </property>
@@ -261,8 +726,8 @@
    <slot>findCollocations()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>653</x>
-     <y>477</y>
+     <x>770</x>
+     <y>637</y>
     </hint>
     <hint type="destinationlabel">
      <x>830</x>
@@ -277,8 +742,8 @@
    <slot>onBigramsChecked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>493</x>
-     <y>58</y>
+     <x>770</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
      <x>619</x>
@@ -293,12 +758,44 @@
    <slot>onNgramsChecked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>487</x>
-     <y>300</y>
+     <x>770</x>
+     <y>197</y>
     </hint>
     <hint type="destinationlabel">
      <x>619</x>
      <y>288</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ignoredWordsCheckBox</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onUseIgnoredWordsChecked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>820</x>
+     <y>556</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>576</x>
+     <y>674</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>signsOfSegmCheckBox</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onUseSignsOfSegmChecked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>802</x>
+     <y>500</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>302</x>
+     <y>677</y>
     </hint>
    </hints>
   </connection>
@@ -307,5 +804,7 @@
   <slot>findCollocations()</slot>
   <slot>onBigramsChecked()</slot>
   <slot>onNgramsChecked()</slot>
+  <slot>onUseSignsOfSegmChecked()</slot>
+  <slot>onUseIgnoredWordsChecked()</slot>
  </slots>
 </ui>

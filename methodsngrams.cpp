@@ -8,6 +8,10 @@ MethodsNGrams::MethodsNGrams(WordsStatisticNGrams *wordsStats)
     ranking(wordsStats);
 }
 
+MethodsNGrams::~MethodsNGrams()
+{
+}
+
 void MethodsNGrams::ranking(WordsStatisticNGrams *ws)
 {
     QString collocation = "";
@@ -17,28 +21,21 @@ void MethodsNGrams::ranking(WordsStatisticNGrams *ws)
     {
         collocation = iter.key();
 
-        double avp = Avp(ws, collocation);
+        double avp = getAvp(ws, collocation);
         double rankSI = getSIRank(ws, avp, collocation);
         double rankSCP = getSCPRank(ws, avp, collocation);
 
-        collocationsRankSI.push_back(std::make_pair<QString, double>(collocation, rankSI));
-        collocationsRankSCP.push_back(std::make_pair<QString, double>(collocation, rankSCP));
+        collocationsRankSI.push_back(std::make_pair(collocation, rankSI));
+        collocationsRankSCP.push_back(std::make_pair(collocation, rankSCP));
 
         iter++;
     }
-
-
-//    std::sort(collocationsRankSI.begin(), collocationsRankSI.end(),
-//            boost::bind(&std::pair<QString, double>::second, _1) >
-//            boost::bind(&std::pair<QString, double>::second, _2));
-
-//    std::sort(collocationsRankSCP.begin(), collocationsRankSCP.end(),
-//            boost::bind(&std::pair<QString, double>::second, _1) >
-//            boost::bind(&std::pair<QString, double>::second, _2));
-
 }
 
-double MethodsNGrams::Avp(WordsStatisticNGrams *ws, QString collocation)
+
+
+
+double MethodsNGrams::getAvp(WordsStatisticNGrams *ws, QString collocation)
 {
     QStringList wordsInColl = collocation.split(" ");
     double avpSum = 0;
@@ -69,6 +66,9 @@ double MethodsNGrams::Avp(WordsStatisticNGrams *ws, QString collocation)
     return (avpSum / (double)(ws->getN()-1));
 }
 
+
+
+
 double MethodsNGrams::getSIRank(WordsStatisticNGrams *ws, double avp, QString collocation)
 {
     double collCnt = ws->wordsStatistic[ws->getN()-1][collocation];
@@ -86,4 +86,3 @@ double MethodsNGrams::getSCPRank(WordsStatisticNGrams *ws, double avp, QString c
 
     return ((collPropability * collPropability) / avp);
 }
-

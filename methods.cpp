@@ -1,55 +1,42 @@
 #include "methods.h"
+#include "QStringList"
 
-Methods::Methods(WordsStatistics *wordsStats)
+Methods::Methods(WordsStatisticNGrams *wordsStats)
 {
     ranking(wordsStats);
 }
 
-void Methods::ranking(WordsStatistics *ws)
+Methods::~Methods()
 {
-    std::vector<std::vector<Corpus2::Token*> > & allWordsWithPairs = ws->getAllWordsWithPairs();
 
-    //liczba słów w korpusie
-    int n = ws->getWordsCount();
+}
 
-    for(size_t i=0; i<allWordsWithPairs.size(); i++)
+void Methods::ranking(WordsStatisticNGrams *ws)
+{
+    QString collocation = "";
+    int biGram = 2;
+
+    QHash<QString, int>::const_iterator iter = ws->wordsStatistic[biGram-1].constBegin();
+    while(iter != ws->wordsStatistic[biGram-1].constEnd())
     {
-        if(allWordsWithPairs[i].size() > 1)
-        {
-            //liczba wystapien slowa w1 w korpusie
-            int word1Count = ws->getNumberOfInstancesOfWord(allWordsWithPairs[i][0]);
+        collocation = iter.key();
 
-            for(size_t j=1; j<allWordsWithPairs[i].size(); j++)
-            {
-                std::pair<Corpus2::Token*, Corpus2::Token*> collocation;
-                collocation = std::make_pair(allWordsWithPairs[i][0], allWordsWithPairs[i][j]);
+        QStringList wordsInColl = collocation.split(" ");
+        int numberOfInstancesOfWord1 = ws->wordsStatistic[0][wordsInColl[0]];
+        int numberOfInstancesOfWord2 = ws->wordsStatistic[0][wordsInColl[1]];
+        int numberOfInstancesOfWordPair = ws->wordsStatistic[biGram-1][collocation];
+        int allWordsInCorpusCount = ws->getWordsCount();
 
-                std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double> collocationWithRank;
+        double rankFSCP = getFSCPRank((double)numberOfInstancesOfWordPair, (double)numberOfInstancesOfWord1,(double) numberOfInstancesOfWord2);
+        double rankZScore = getZScoreRank((double)numberOfInstancesOfWordPair, (double)numberOfInstancesOfWord1, (double)numberOfInstancesOfWord2, (double)allWordsInCorpusCount);
+        double rankPMI = getPMIRank((double)numberOfInstancesOfWordPair, (double)numberOfInstancesOfWord1, (double)numberOfInstancesOfWord2, (double)allWordsInCorpusCount);
 
-                //liczba wystapien pary slow (w1, w2) w korpusie
-                int pairCount = ws->getNumberOfInstancesOfPair(allWordsWithPairs[i][0], allWordsWithPairs[i][j]);
+        collocationsRankFSCP.push_back(std::make_pair(collocation, rankFSCP));
+        collocationsRankZScore.push_back(std::make_pair(collocation, rankZScore));
+        collocationsRankPMI.push_back(std::make_pair(collocation, rankPMI));
 
-                //liczba wystapien slowa w2 w korpusie
-                int word2Count = ws->getNumberOfInstancesOfWord(allWordsWithPairs[i][j]);
-
-                //rankingi
-                double rFSCP = getFSCPRank((double)pairCount, (double)word1Count, (double)word2Count);
-                double rZScore = getZScoreRank((double)pairCount, (double)word1Count, (double)word2Count, (double)n);
-                double rPMI = getPMIRank((double)pairCount, (double)word1Count, (double)word2Count, (double)n);
-
-                collocationWithRank = std::make_pair(collocation, rFSCP);
-                collocationsRankFSCP.push_back(collocationWithRank);
-
-                collocationWithRank = std::make_pair(collocation, rZScore);
-                collocationsRankZScore.push_back(collocationWithRank);
-
-                collocationWithRank = std::make_pair(collocation, rPMI);
-                collocationsRankPMI.push_back(collocationWithRank);
-            }
-        }
+        iter++;
     }
-
-//    sortingRanking();
 }
 
 
@@ -91,22 +78,4 @@ double Methods::getZScoreRank(double numberOfInstancesOfWordPair, double numberO
 double Methods::getPMIRank(double numberOfInstancesOfWordPair, double numberOfInstancesOfWord1, double numberOfInstancesOfWord2, double numberOfAllInstances)
 {
     return log2((getPropabilityOfWordPair(numberOfInstancesOfWordPair, numberOfAllInstances)) / (getPropabilityOfWord(numberOfInstancesOfWord1, numberOfAllInstances) * getPropabilityOfWord(numberOfInstancesOfWord2, numberOfAllInstances)));
-}
-
-
-
-
-void Methods::sortingRanking()
-{
-    std::sort(collocationsRankFSCP.begin(), collocationsRankFSCP.end(),
-            boost::bind(&std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double>::second, _1) >
-            boost::bind(&std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double>::second, _2));
-
-    std::sort(collocationsRankZScore.begin(), collocationsRankZScore.end(),
-            boost::bind(&std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double>::second, _1) >
-            boost::bind(&std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double>::second, _2));
-
-    std::sort(collocationsRankPMI.begin(), collocationsRankPMI.end(),
-            boost::bind(&std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double>::second, _1) >
-            boost::bind(&std::pair<std::pair<Corpus2::Token*, Corpus2::Token*>, double>::second, _2));
 }

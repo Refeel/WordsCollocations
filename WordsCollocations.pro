@@ -11,20 +11,18 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = WordsCollocations
 TEMPLATE = app
 
-
+CONFIG += c++11
 
 LIBS += -lcorpus2 -lpwrutils
 
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    wordsstatistics.cpp \
     methods.cpp \
     wordsstatisticngrams.cpp \
     methodsngrams.cpp
 
 HEADERS  += mainwindow.h \
-    wordsstatistics.h \
     methods.h \
     wordsstatisticngrams.h \
     methodsngrams.h
