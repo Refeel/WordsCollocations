@@ -87,9 +87,13 @@ void WordsStatisticNGrams::makeStatistics(Corpus2::XcesReader &xr)
         while(isIgnored(token) == true)
         {
             token = xr.get_next_token();
-            wordsCount++;
             if(token == NULL)
+            {
+
                 return;
+            }
+
+            wordsCount++;
         }
 
         tokens[n-1] = token->get_preferred_lexeme(tagset).lemma_utf8().c_str();
@@ -102,13 +106,16 @@ void WordsStatisticNGrams::makeStatistics(Corpus2::XcesReader &xr)
             for(int position=0; position<positionsOfSegmentedSigns.size(); position++)
             {
                 int numbersOfWords = 0;
+                int from = 0;
                 if(position == 0)
                 {
                     numbersOfWords = positionsOfSegmentedSigns[position];
+                    from = 0;
                 }
                 else
                 {
                     numbersOfWords = positionsOfSegmentedSigns[position] - positionsOfSegmentedSigns[position-1] - 1;
+                    from = positionsOfSegmentedSigns[position-1] + 1;
                 }
 
                 for(int i=1; i<=numbersOfWords; i++)
@@ -118,7 +125,7 @@ void WordsStatisticNGrams::makeStatistics(Corpus2::XcesReader &xr)
                         QString elements = "";
                         for(int k=0; k<i; k++)
                         {
-                            elements.append(tokens[j]).append(" ");
+                            elements.append(tokens[from+j+k]).append(" ");
                         }
                         elements.chop(1);
 
@@ -221,6 +228,8 @@ std::vector<int> WordsStatisticNGrams::isSegmentedSign(std::vector<QString> toke
             }
         }
     }
+
+    std::sort(positionOfSigns.begin(), positionOfSigns.end());
 
     return positionOfSigns;
 }
