@@ -18,6 +18,7 @@
 
 #include <libcorpus2/tagsetmanager.h>
 #include <libcorpus2/io/xcesreader.h>
+#include <libcorpus2/ann/annotatedsentence.h>
 
 
 MainWindow::MainWindow(QWidget *parent) :
