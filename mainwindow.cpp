@@ -18,7 +18,7 @@
 
 #include <libcorpus2/tagsetmanager.h>
 #include <libcorpus2/io/xcesreader.h>
-#include <libcorpus2/ann/annotatedsentence.h>
+
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -70,14 +70,15 @@ void MainWindow::onUseIgnoredWordsChecked()
 
 void MainWindow::findCollocations()
 {
-    QString fileName = QFileDialog::getOpenFileName(0, "Otworz korpus", "/home/ijn/","*.ccl");
+    QString fileName = QFileDialog::getOpenFileName(0, "Otworz korpus", "/home/ijn/","*.ccl *.xml");
     if(fileName.size() == 0)
         return;
 
     const Corpus2::Tagset tagset = Corpus2::get_named_tagset("nkjp");
     std::ifstream istr(fileName.toUtf8());
 
-    Corpus2::XcesReader *xr = new Corpus2::XcesReader(tagset, istr);
+//    Corpus2::XcesReader *xr = new Corpus2::XcesReader(tagset, istr);
+    boost::shared_ptr<Corpus2::TokenReader> reader = Corpus2::TokenReader::create_path_reader("ccl", tagset, fileName.toStdString());
 
     delete wordStats; wordStats = NULL;
     delete methodsBi; methodsBi = NULL;
@@ -111,7 +112,7 @@ void MainWindow::findCollocations()
         bool zscoreStatus = ui->zscoreCheckBox->isChecked();
         bool pmiStatus = ui->PMICheckBox->isChecked();
 
-        wordStats = new WordsStatisticNGrams(*xr, 2);
+        wordStats = new WordsStatisticNGrams(reader, 2);
 
         for(int i=0; i<signsOfSegm.size(); i++)
             wordStats->addSegmentationSign(signsOfSegm[i]);
@@ -180,7 +181,7 @@ void MainWindow::findCollocations()
         bool miStatus = ui->MICheckBox->isChecked();
         bool scpStatus = ui->SCPCheckBox->isChecked();
 
-        wordStats = new WordsStatisticNGrams(*xr, n);
+        wordStats = new WordsStatisticNGrams(reader, n);
 
         for(int i=0; i<signsOfSegm.size(); i++)
             wordStats->addSegmentationSign(signsOfSegm[i]);
@@ -236,5 +237,4 @@ void MainWindow::findCollocations()
     QHeaderView *header = ui->collTableWidget->horizontalHeader();
     connect(header, SIGNAL(sectionClicked(int) ), this, SLOT(onSectionClicked(int)) );
 
-    delete xr;
 }

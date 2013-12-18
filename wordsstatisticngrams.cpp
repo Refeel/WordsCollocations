@@ -1,10 +1,12 @@
 #include "wordsstatisticngrams.h"
-#include <initializer_list>
 
-WordsStatisticNGrams::WordsStatisticNGrams(Corpus2::XcesReader &xr, unsigned n)
+#include <libcorpus2/ann/annotatedsentence.h>
+#include <libcorpus2/io/reader.h>
+
+WordsStatisticNGrams::WordsStatisticNGrams(boost::shared_ptr<Corpus2::TokenReader> &reader, unsigned n)
 {
-    xreader = &xr;
-    tagset = xreader->tagset();
+    this->reader = reader.get();
+    tagset = reader->tagset();
 
     setN(n);
     wordsCount = 0;
@@ -20,10 +22,14 @@ WordsStatisticNGrams::~WordsStatisticNGrams()
 {
 }
 
+
+
 void WordsStatisticNGrams::makeStatistics()
 {
-    makeStatistics(*xreader);
+    makeStatistics(*reader);
 }
+
+
 
 void WordsStatisticNGrams::setN(unsigned n)
 {
@@ -60,11 +66,32 @@ void WordsStatisticNGrams::setFilterProperNamesEnabled(bool filter)
     filterProperNames = filter;
 }
 
-void WordsStatisticNGrams::makeStatistics(Corpus2::XcesReader &xr)
+
+
+void WordsStatisticNGrams::makeStatistics(Corpus2::TokenReader &reader)
 {
     wordsStatistic.resize(n);
 
-    std::vector<QString> tokens(n);
+    Corpus2::Sentence::Ptr sentence;
+
+    while(sentence = reader.get_next_sentence())
+    {
+        makeStatisticsForSentence(sentence);
+    }
+
+    return;
+}
+
+void WordsStatisticNGrams::makeStatisticsForSentence(Corpus2::Sentence::Ptr sentence)
+{
+    std::vector<Corpus2::Token*> tokensInSentence = sentence->tokens();
+
+    //wskazowka dla pawla:
+    Corpus2::AnnotatedSentence::Ptr annSentence = Corpus2::AnnotatedSentence::wrap_sentence(sentence);
+
+    TokenIterator xr(tokensInSentence);
+
+    std::vector<QString> tokens;
 
     for(size_t i=0; i<n-1; i++)
     {
@@ -73,10 +100,19 @@ void WordsStatisticNGrams::makeStatistics(Corpus2::XcesReader &xr)
         while(isIgnored(token) == true)
         {
             token = xr.get_next_token();
-            wordsCount++;
+
+            if(token == NULL)
+            {
+                countLastWords(tokens);
+                return;
+            }
+            else
+            {
+                wordsCount++;
+            }
         }
 
-        tokens[i] = token->get_preferred_lexeme(tagset).lemma_utf8().c_str();
+        tokens.push_back(token->get_preferred_lexeme(tagset).lemma_utf8().c_str());
     }
 
     Corpus2::Token* token;
@@ -84,25 +120,31 @@ void WordsStatisticNGrams::makeStatistics(Corpus2::XcesReader &xr)
     {
         wordsCount++;
 
+        //usuniecie ostatniego tokenu z wektora, gdyz zostanie on zastapiony nowym
+        if(tokens.size() == n)
+            tokens.pop_back();
+
         while(isIgnored(token) == true)
         {
             token = xr.get_next_token();
+
             if(token == NULL)
             {
-
+                countLastWords(tokens);
                 return;
             }
-
-            wordsCount++;
+            else
+            {
+                wordsCount++;
+            }
         }
 
-        tokens[n-1] = token->get_preferred_lexeme(tagset).lemma_utf8().c_str();
+        //dodanie nowego tokenu do wektora
+        tokens.push_back(token->get_preferred_lexeme(tagset).lemma_utf8().c_str());
 
         std::vector<int> positionsOfSegmentedSigns = isSegmentedSign(tokens);
         if(positionsOfSegmentedSigns.size() != 0)
         {
-            positionsOfSegmentedSigns.push_back(tokens.size());
-
             for(int position=0; position<positionsOfSegmentedSigns.size(); position++)
             {
                 int numbersOfWords = 0;
@@ -143,21 +185,37 @@ void WordsStatisticNGrams::makeStatistics(Corpus2::XcesReader &xr)
                 }
             }
 
-            for(unsigned i=0; i<n-1; i++)
+            int wordsInTokens = 0;
+            for(int i=positionsOfSegmentedSigns[positionsOfSegmentedSigns.size()-1]+1, j=0; i<n; i++, j++)
+            {
+                tokens[j] = tokens[i];
+                wordsInTokens++;
+            }
+
+            for(int i=wordsInTokens; i<n-1; i++)
             {
                 Corpus2::Token* newToken = xr.get_next_token();
                 if(newToken == NULL)
+                {
+                    countLastWords(tokens);
                     return;
+                }
 
                 wordsCount++;
 
                 while(isIgnored(newToken) == true)
                 {
                     newToken = xr.get_next_token();
-                    if(newToken == NULL)
-                        return;
 
-                    wordsCount++;
+                    if(newToken == NULL)
+                    {
+                        countLastWords(tokens);
+                        return;
+                    }
+                    else
+                    {
+                        wordsCount++;
+                    }
                 }
 
                 tokens[i] = newToken->get_preferred_lexeme(tagset).lemma_utf8().c_str();
@@ -197,6 +255,28 @@ void WordsStatisticNGrams::makeStatistics(Corpus2::XcesReader &xr)
                 tokens[i] = tokens[i+1];
         }
     }
+
+    //dodanie ostatnich slow do statystyki
+    if(tokens.size() == n)
+        tokens.pop_back();
+
+    countLastWords(tokens);
+
+/*
+    //wypisywanie statystyki
+    for(int i=0; i<wordsStatistic.size(); i++)
+    {
+        QHashIterator<QString, int> c(wordsStatistic[i]);
+        while(c.hasNext())
+        {
+            c.next();
+            qDebug() << c.key() << c.value();
+        }
+    }
+
+    qDebug() << "liczba slow: " << wordsCount;
+*/
+
 }
 
 
@@ -251,4 +331,34 @@ bool WordsStatisticNGrams::numberFilter(std::vector<QString> tokens)
     }
 
     return false;
+}
+
+
+
+
+void WordsStatisticNGrams::countLastWords(std::vector<QString> tokens)
+{
+    for(int i=1; i<=tokens.size(); i++)
+    {
+        for(int j=0; j<tokens.size()-i+1; j++)
+        {
+            QString elements = "";
+            for(int k=0; k<i; k++)
+            {
+                elements.append(tokens[j+k]).append(" ");
+            }
+            elements.chop(1);
+
+            bool exist = wordsStatistic[i-1].contains(elements);
+
+            if(!exist)
+            {
+                wordsStatistic[i-1].insert(elements, 1);
+            }
+            else
+            {
+                wordsStatistic[i-1][elements]++;
+            }
+        }
+    }
 }
