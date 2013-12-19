@@ -2,6 +2,12 @@
 
 #include <libcorpus2/ann/annotatedsentence.h>
 #include <libcorpus2/io/reader.h>
+#include <libcorpus2/io/xcesreader.h>
+#include <libcorpus2/tagsetmanager.h>
+
+#include <set>
+
+#define _VERBOSE_MODE_
 
 WordsStatisticNGrams::WordsStatisticNGrams(boost::shared_ptr<Corpus2::TokenReader> &reader, unsigned n)
 {
@@ -16,20 +22,24 @@ WordsStatisticNGrams::WordsStatisticNGrams(boost::shared_ptr<Corpus2::TokenReade
 
     setFilterNumbersEnabled(false);
     setFilterProperNamesEnabled(false);
+
+    initializeAnnotations();
 }
 
 WordsStatisticNGrams::~WordsStatisticNGrams()
 {
 }
 
-
+void WordsStatisticNGrams::initializeAnnotations()
+{
+    annotations.push_back("loc");
+    annotations.push_back("per");
+}
 
 void WordsStatisticNGrams::makeStatistics()
 {
     makeStatistics(*reader);
 }
-
-
 
 void WordsStatisticNGrams::setN(unsigned n)
 {
@@ -66,8 +76,6 @@ void WordsStatisticNGrams::setFilterProperNamesEnabled(bool filter)
     filterProperNames = filter;
 }
 
-
-
 void WordsStatisticNGrams::makeStatistics(Corpus2::TokenReader &reader)
 {
     wordsStatistic.resize(n);
@@ -86,8 +94,44 @@ void WordsStatisticNGrams::makeStatisticsForSentence(Corpus2::Sentence::Ptr sent
 {
     std::vector<Corpus2::Token*> tokensInSentence = sentence->tokens();
 
-    //wskazowka dla pawla:
-    Corpus2::AnnotatedSentence::Ptr annSentence = Corpus2::AnnotatedSentence::wrap_sentence(sentence);
+    //podpowiedz byla bledna! te smieszne typy *::Ptr cos nie chcialy banglac... smuteczek :(
+    boost::shared_ptr<Corpus2::Sentence> ordinarySentence = boost::shared_ptr<Corpus2::Sentence>(sentence);
+    boost::shared_ptr<Corpus2::AnnotatedSentence> annotatedSentence = Corpus2::AnnotatedSentence::wrap_sentence(ordinarySentence);
+
+    std::set<QString> properNames;
+
+    //wyszukujemy nazwy wlasne w aktualnie przetwarzanym zdaniu
+    if(filterProperNames)
+    {
+        for(size_t i=0; i<annotations.size(); i++)
+        {
+            if(annotatedSentence->has_channel(annotations[i]))
+            {
+                Corpus2::AnnotationChannel channel = annotatedSentence->get_channel(annotations[i]);
+
+                std::vector<int> segments = channel.segments();
+                for(size_t j=0; j<segments.size(); j++)
+                {
+                    if(segments[j] > 0)
+                    {
+                        properNames.insert(QString::fromStdString(tokensInSentence[j]->get_preferred_lexeme(tagset).lemma_utf8().c_str()));
+
+#ifdef _VERBOSE_MODE_
+                        QString info;
+                        info.append("Wykryto nazwe wlasna: ");
+                        info.append(QString::fromStdString(tokensInSentence[j]->get_preferred_lexeme(tagset).lemma_utf8().c_str()));
+                        info.append(" (");
+                        info.append(QString::fromStdString(tokensInSentence[j]->orth_utf8()));
+                        info.append(", ");
+                        info.append(QString::fromStdString(annotations[i]));
+                        info.append(")");
+                        qDebug() << info;
+#endif
+                    }
+                }
+            }
+        }
+    }
 
     TokenIterator xr(tokensInSentence);
 
@@ -227,8 +271,26 @@ void WordsStatisticNGrams::makeStatisticsForSentence(Corpus2::Sentence::Ptr sent
             {
                 if(filterNumbers && pivot == n)
                 {
-                    if(numberFilter(tokens) == true)
+                    if(numberFilter(tokens)) break;
+                }
+
+                if(filterProperNames && pivot == n)
+                {
+                    if(properNameFilter(tokens, properNames))
+                    {
+#ifdef _VERBOSE_MODE_
+                        QString info;
+                        info.append("Odrzucono kolokacje zawierajaca nazwe wlasna: < ");
+                        for(size_t i=0; i<tokens.size(); i++)
+                        {
+                            info.append(tokens[i]);
+                            info.append(" ");
+                        }
+                        info.append(">");
+                        qDebug() << info;
+#endif
                         break;
+                    }
                 }
 
                 QString left = "";
@@ -261,26 +323,7 @@ void WordsStatisticNGrams::makeStatisticsForSentence(Corpus2::Sentence::Ptr sent
         tokens.pop_back();
 
     countLastWords(tokens);
-
-/*
-    //wypisywanie statystyki
-    for(int i=0; i<wordsStatistic.size(); i++)
-    {
-        QHashIterator<QString, int> c(wordsStatistic[i]);
-        while(c.hasNext())
-        {
-            c.next();
-            qDebug() << c.key() << c.value();
-        }
-    }
-
-    qDebug() << "liczba slow: " << wordsCount;
-*/
-
 }
-
-
-
 
 bool WordsStatisticNGrams::isIgnored(Corpus2::Token *token)
 {
@@ -314,10 +357,7 @@ std::vector<int> WordsStatisticNGrams::isSegmentedSign(std::vector<QString> toke
     return positionOfSigns;
 }
 
-
-
-
-bool WordsStatisticNGrams::numberFilter(std::vector<QString> tokens)
+bool WordsStatisticNGrams::numberFilter(std::vector<QString>& tokens)
 {
     for(unsigned i=0; i<tokens.size(); i++)
     {
@@ -333,8 +373,18 @@ bool WordsStatisticNGrams::numberFilter(std::vector<QString> tokens)
     return false;
 }
 
+bool WordsStatisticNGrams::properNameFilter(std::vector<QString>& tokens, std::set<QString>& properNames)
+{
+    for(size_t i=0; i<tokens.size(); i++)
+    {
+        if(properNames.find(tokens[i]) != properNames.end())
+        {
+            return true;
+        }
+    }
 
-
+    return false;
+}
 
 void WordsStatisticNGrams::countLastWords(std::vector<QString> tokens)
 {

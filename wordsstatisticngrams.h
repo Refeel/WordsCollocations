@@ -26,6 +26,7 @@ public:
     void setFilterProperNamesEnabled(bool filter);
 
     std::vector<QHash<QString, int> > wordsStatistic;
+    std::vector<std::string> annotations;
 
 private:
     Corpus2::TokenReader *reader;
@@ -46,8 +47,10 @@ private:
     bool isIgnored(Corpus2::Token *token);
     std::vector<int> isSegmentedSign(std::vector<QString> tokens);
 
-    bool numberFilter(std::vector<QString> tokens);
-    bool properNameFilter(std::vector<QString> tokens);
+    void initializeAnnotations();
+
+    bool numberFilter(std::vector<QString>& tokens);
+    bool properNameFilter(std::vector<QString>& tokens, std::set<QString>& properNames);
 
 
     void countLastWords(std::vector<QString> tokens);

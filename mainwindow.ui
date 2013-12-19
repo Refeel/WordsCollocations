@@ -430,7 +430,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>45</y>
+       <y>30</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -494,6 +494,24 @@
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="propNamesCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>171</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
+     <property name="text">
+      <string>proper names filter</string>
      </property>
     </widget>
    </widget>
@@ -667,24 +685,6 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QCheckBox" name="propNamesCheckBox">
-    <property name="geometry">
-     <rect>
-      <x>580</x>
-      <y>350</y>
-      <width>171</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <italic>false</italic>
-     </font>
-    </property>
-    <property name="text">
-     <string>proper names filter</string>
-    </property>
-   </widget>
    <zorder>ngramsGroupBox</zorder>
    <zorder>bigramsGroupBox</zorder>
    <zorder>bigramsRadioButton</zorder>
@@ -693,7 +693,6 @@
    <zorder>filtersGroupBox</zorder>
    <zorder>groupBox_2</zorder>
    <zorder>line_12</zorder>
-   <zorder>propNamesCheckBox</zorder>
    <zorder>collTableWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -702,7 +701,7 @@
      <x>0</x>
      <y>0</y>
      <width>999</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
