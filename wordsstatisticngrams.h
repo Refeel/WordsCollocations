@@ -20,6 +20,8 @@ public:
 
     void makeStatistics();
 
+    int getCollocationOccurs(QString coll);
+
     void addSegmentationSign(QString sign);
     void addIgnoredWord(std::string word);
     void setFilterNumbersEnabled(bool filter);

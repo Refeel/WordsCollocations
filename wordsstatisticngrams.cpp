@@ -41,6 +41,11 @@ void WordsStatisticNGrams::makeStatistics()
     makeStatistics(*reader);
 }
 
+int WordsStatisticNGrams::getCollocationOccurs(QString coll)
+{
+    return wordsStatistic[this->n-1][coll];
+}
+
 void WordsStatisticNGrams::setN(unsigned n)
 {
     this->n = n;
@@ -94,7 +99,6 @@ void WordsStatisticNGrams::makeStatisticsForSentence(Corpus2::Sentence::Ptr sent
 {
     std::vector<Corpus2::Token*> tokensInSentence = sentence->tokens();
 
-    //podpowiedz byla bledna! te smieszne typy *::Ptr cos nie chcialy banglac... smuteczek :(
     boost::shared_ptr<Corpus2::Sentence> ordinarySentence = boost::shared_ptr<Corpus2::Sentence>(sentence);
     boost::shared_ptr<Corpus2::AnnotatedSentence> annotatedSentence = Corpus2::AnnotatedSentence::wrap_sentence(ordinarySentence);
 

@@ -111,6 +111,7 @@ void MainWindow::findCollocations()
         bool fscpStatus = ui->FSCPCheckBox->isChecked();
         bool zscoreStatus = ui->zscoreCheckBox->isChecked();
         bool pmiStatus = ui->PMICheckBox->isChecked();
+        bool collocationsCountStatus = ui->biCollsCountCheckBox->isChecked();
 
         wordStats = new WordsStatisticNGrams(reader, 2);
 
@@ -129,12 +130,12 @@ void MainWindow::findCollocations()
 
 
         ui->collTableWidget->setRowCount(methodsBi->collocationsRankFSCP.size());
-        ui->collTableWidget->setColumnCount(1 + (int)fscpStatus + (int)zscoreStatus + (int)pmiStatus);
+        ui->collTableWidget->setColumnCount(1 + (int)fscpStatus + (int)zscoreStatus + (int)pmiStatus + (int)collocationsCountStatus);
 
         ui->collTableWidget->setHorizontalHeaderItem(0, new QTableWidgetItem("Collocations"));
 
         int colsNum = 1;
-        int fscpColId=0, zscoreColId=0, pmiColId=0;
+        int fscpColId=0, zscoreColId=0, pmiColId=0, collsCountId=0;
 
         if(fscpStatus)
             ui->collTableWidget->setHorizontalHeaderItem(fscpColId = colsNum++, new QTableWidgetItem("FSCP"));
@@ -144,6 +145,9 @@ void MainWindow::findCollocations()
 
         if(pmiStatus)
             ui->collTableWidget->setHorizontalHeaderItem(pmiColId = colsNum++, new QTableWidgetItem("PMI"));
+
+        if(collocationsCountStatus)
+            ui->collTableWidget->setHorizontalHeaderItem(collsCountId = colsNum++, new QTableWidgetItem("Coll count"));
 
 
 
@@ -173,6 +177,13 @@ void MainWindow::findCollocations()
                 item->setData(Qt::DisplayRole, methodsBi->collocationsRankPMI[i].second);
                 ui->collTableWidget->setItem(i,pmiColId, item);
             }
+
+            if(collocationsCountStatus)
+            {
+                item = new QTableWidgetItem();
+                item->setData(Qt::DisplayRole, wordStats->getCollocationOccurs(QString(methodsBi->collocationsRankFSCP[i].first)));
+                ui->collTableWidget->setItem(i,collsCountId, item);
+            }
         }
     }
     else if(ui->ngramsRadioButton->isChecked())
@@ -180,6 +191,7 @@ void MainWindow::findCollocations()
         unsigned n = ui->nSpinBox->value();
         bool miStatus = ui->MICheckBox->isChecked();
         bool scpStatus = ui->SCPCheckBox->isChecked();
+        bool collocationsCountStatus = ui->nCollsCountCheckBox->isChecked();
 
         wordStats = new WordsStatisticNGrams(reader, n);
 
@@ -197,19 +209,22 @@ void MainWindow::findCollocations()
         methodsN = new MethodsNGrams(wordStats);
 
         ui->collTableWidget->setRowCount(methodsN->collocationsRankSCP.size());
-        ui->collTableWidget->setColumnCount(1 + (int)miStatus + (int)scpStatus);
+        ui->collTableWidget->setColumnCount(1 + (int)miStatus + (int)scpStatus + (int)collocationsCountStatus);
 
         ui->collTableWidget->setHorizontalHeaderItem(0, new QTableWidgetItem("Collocations"));
 
         int colsNum = 1;
 
-        int miColId=0, scpColId=0;
+        int miColId=0, scpColId=0, collsCountId=0;
 
         if(miStatus)
             ui->collTableWidget->setHorizontalHeaderItem(miColId = colsNum++, new QTableWidgetItem("MI"));
 
         if(scpStatus)
             ui->collTableWidget->setHorizontalHeaderItem(scpColId = colsNum++, new QTableWidgetItem("SCP"));
+
+        if(collocationsCountStatus)
+            ui->collTableWidget->setHorizontalHeaderItem(collsCountId = colsNum++, new QTableWidgetItem("Coll count"));
 
 
         QTableWidgetItem *item;
@@ -230,6 +245,13 @@ void MainWindow::findCollocations()
                 item = new QTableWidgetItem();
                 item->setData(Qt::DisplayRole, methodsN->collocationsRankSCP[i].second);
                 ui->collTableWidget->setItem(i,scpColId, item);
+            }
+
+            if(collocationsCountStatus)
+            {
+                item = new QTableWidgetItem();
+                item->setData(Qt::DisplayRole, QString(methodsN->collocationsRankSCP[i].first));
+                ui->collTableWidget->setItem(i,collsCountId, item);
             }
         }
     }
